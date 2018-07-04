@@ -1,0 +1,357 @@
+{% extends 'base.html' %} {% load static %} {% load i18n %} {% load bootstrap3 %} {% block title %}
+<title>网管系统_用户详情</title>
+{% endblock %} {% block custom_head_css %}
+<link rel="stylesheet" type="text/css" href="{% static "css/sweetalert.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "css/toastr.min.css" %}" /> {% endblock %} {% block content %}
+<div class="page-content">
+    <!--<div class="page-header">
+        <h1>
+                <i class="icon-user"></i>
+                {{ action }}
+        </h1>
+    </div>/.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div>
+                <div id="user-profile-1" class="user-profile row">
+                    <div class="col-xs-12 col-sm-3 center">
+                        <div>
+                            <span class="profile-picture">
+                                <img id="avatar" class="img-responsive" alt="Alex's Avatar" src="{% static  "avatars/profile-pic.jpg" %}">
+                            </span>
+
+                            <div class="space-4"></div>
+
+                            <div class="width-80 label label-info label-xlg arrowed-in arrowed-in-right">
+                                <div class="inline position-relative">
+                                    <a href="#" class="user-title-label dropdown-toggle" data-toggle="dropdown">
+                                        <i class="icon-circle light-green middle"></i>
+                                        &nbsp;
+                                        <span class="white">{{ user_object.name }}</span>
+                                    </a>
+
+                                    <ul class="align-left dropdown-menu dropdown-caret dropdown-lighter">
+                                        <li class="dropdown-header"> Change Status </li>
+
+                                        <li>
+                                            <a href="#">
+                                                <i class="icon-circle green"></i>
+                                                &nbsp;
+                                                <span class="green">Available</span>
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#">
+                                                <i class="icon-circle red"></i>
+                                                &nbsp;
+                                                <span class="red">Busy</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="icon-circle grey"></i>
+                                                &nbsp;
+                                                <span class="grey">Invisible</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-6"></div>
+
+                        <div class="profile-contact-info">
+                            <div class="profile-contact-links">
+
+                                <a class="btn btn-link" href="mailto:{{ user_object.email }}">
+                                    <i class="icon-envelope bigger-120 pink"></i>
+                                    给他（她）发送邮件
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-xs-12 col-sm-9">
+
+                        <div class="col-sm-6 profile-user-info profile-user-info-striped">
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 姓名 </div>
+                                <div class="profile-info-value">
+                                    <i class="icon-user green bigger-110"></i>
+                                    <span class="editable editable-click" id="username">{{ user_object.name }}</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 联系方式 </div>
+                                <div class="profile-info-value">
+                                    <i class="icon-phone light-orange bigger-110"></i>
+                                    <span class="editable editable-click" id="phone">{{ user_object.phone }}</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 邮箱 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="icon-envelope light-blue bigger-110"></i>
+                                    <span class="editable editable-click" id="email">{{ user_object.email }}</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 微信 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="icon-comments pink bigger-110"></i>
+                                    <span class="editable editable-click" id="wechat">{{ user_object.wechat }}</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">用户组 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="icon-group blue bigger-110"></i>
+                                    <span class="editable editable-click" id="group">
+                                        {% for group in user_object.groups.all %} {{ group.name }}&nbsp;&nbsp; {% endfor %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 创建人 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="icon-edit light-red bigger-110"></i>
+                                    <span class="editable editable-click" id="created_by">{{ user_object.created_by }}</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 上次登录 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="icon-check green bigger-110"></i>
+                                    <span class="editable editable-click" id="last_login">{{ user_object.last_login|date:"Y-m-j H:i:s" }}</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-info-row">
+                                <div class="profile-info-name"> 过期时间 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="icon-bell light-orange bigger-110"></i>
+                                    <span class="editable editable-click" id="date_expired">{{ user_object.date_expired|date:"Y-m-j H:i:s" }}</span>
+                                </div>
+                            </div>
+                            <div class="profile-info-row">
+                                <div class="profile-info-name">备注 </div>
+
+                                <div class="profile-info-value">
+                                    <i class="icon-book red bigger-110"></i>
+                                    <span class="editable editable-click" id="comment">{{ user_object.comment }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="widget-box">
+                                <div class="widget-header widget-header-flat widget-header-small">
+                                    <h5>
+                                        <i class="icon-cogs"></i>
+                                        快速修改
+                                    </h5>
+
+                                    <div class="widget-toolbar no-border">
+                                    </div>
+                                </div>
+
+                                <div class="widget-body">
+                                    <div class="widget-main">
+                                        <div style="width: 90%; min-height: 142px; padding: 0px; position: relative;">
+                                            <div class="col-md-12">
+                                                <label class="pull-left inline">
+                                                    <small>激活:</small>
+                                                    <input id="is_active" {% if user_object.is_active %} checked {% endif %} class="ace ace-switch ace-switch-5" _vimium-has-onclick-listener=""
+                                                        type="checkbox">
+                                                    <span class="lbl"> </span>
+                                                </label>
+                                            </div>
+                                            <p>&nbsp;</p>
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>发送重置密码邮件:</td>
+                                                        <td>
+                                                            <span class="pull-right">
+                                                                <button type="button" class="btn btn-primary btn-xs" id="btn-reset-password" style="width: 54px">发送</button>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>修改用户</td>
+                                                        <td>
+                                                            <span class="pull-right">
+                                                                <a class="green" title="修改" href="{% url "users:user-update" pk=user_object.pk %}"><i class="icon-pencil bigger-130"></i></a>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="hr hr8 hr-double"></div>
+
+                                        <div class="clearfix">
+                                            <div class="grid3">
+                                                <span class="grey">
+                                                    <i class="icon-facebook-sign icon-2x blue"></i>
+                                                    &nbsp; likes
+                                                </span>
+                                                <h4 class="bigger pull-right">1,255</h4>
+                                            </div>
+
+                                            <div class="grid3">
+                                                <span class="grey">
+                                                    <i class="icon-twitter-sign icon-2x purple"></i>
+                                                    &nbsp; tweets
+                                                </span>
+                                                <h4 class="bigger pull-right">941</h4>
+                                            </div>
+                                            <div class="grid3">
+                                                <span class="grey">
+                                                    <i class="icon-pinterest-sign icon-2x red"></i>
+                                                    &nbsp; pins
+                                                </span>
+                                                <h4 class="bigger pull-right">1,050</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /widget-main -->
+                                </div>
+                                <!-- /widget-body -->
+                            </div>
+                            <!-- /widget-box -->
+                        </div>
+
+                        <div class="col-sm-12 widget-box transparent">
+                            <div class="widget-header widget-header-small">
+                                <h4 class="blue smaller">
+                                    <i class="icon-rss orange"></i>
+                                    历史记录
+                                </h4>
+
+                                <div class="widget-toolbar action-buttons">
+                                    <a href="#" data-action="reload">
+                                        <i class="icon-refresh blue"></i>
+                                    </a>
+
+                                    &nbsp;
+                                    <a href="#" class="pink">
+                                        <i class="icon-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="widget-body">
+                                <div class="widget-main padding-8">
+                                    <!-- time line -->
+                                <div id="profile-feed-1" class="profile-feed">
+                                    <div class="timeline-container timeline-style2">
+                                            <div class="timeline-items">
+                                                {% for history in user_object.history_all %}
+                                                <div class="timeline-item clearfix">
+                                                    <div class="timeline-info">
+                                                        <span class="timeline-date">{{ history.date|date:"Y-m-j H:i:s" }}</span>
+                                        
+                                                        <i class="timeline-indicator btn btn-info no-hover"></i>
+                                                    </div>
+                                        
+                                                    <div class="widget-box transparent">
+                                                        <div class="widget-body">
+                                                            <div class="widget-main no-padding">
+                                                                {{ history.event }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div><!-- /.timeline-items -->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    {% endblock %} {% block custom_foot_js %}
+
+    <script src="{% static "js/sweetalert.min.js"  %}"></script>
+    <script src="{% static "js/toastr.min.js"  %}"></script>
+    <script src="{% static "js/jquery.slimscroll.min.js"  %}"></script>
+    <script>
+        $('#profile-feed-1').slimScroll({
+			height: '250px',
+			alwaysVisible : true
+			});
+
+        $(document).ready(function () {
+
+            })
+            .on('click', '#is_active', function () {
+                var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
+                var checked = $(this).prop('checked');
+                var body = {
+                    'is_active': checked
+                };
+                var success = '{% trans "更新成功!" %}';
+                APIUpdateAttr({
+                    url: the_url,
+                    body: JSON.stringify(body),
+                    success_message: success
+                });
+            })
+
+            .on('click', '#btn-reset-password', function () {
+                function doReset() {
+                    var the_url = '{% url "api-users:user-reset-password" pk=user_object.id %}';
+                    var body = {};
+                    var success = function () {
+                        var msg = "邮件将发送到用户邮箱中";
+                        swal("重置密码", msg, "success");
+                    };
+                    APIUpdateAttr({
+                        url: the_url,
+                        body: JSON.stringify(body),
+                        success: success
+                    });
+                }
+                swal({
+                    title: "确定？",
+                    text: "即将重置用户密码， 重置后的密码将发送到用户邮箱。",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "确认",
+                    closeOnConfirm: false
+                }, function () {
+                    doReset();
+                });
+
+
+            })
+
+    </script>
+
+    {% endblock %}

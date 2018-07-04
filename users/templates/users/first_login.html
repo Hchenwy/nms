@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block title %}
+<title>网管系统_首次登录</title>
+{% endblock %}
+{% block content %}
+<div class="page-content">
+    <!--<div class="page-header">
+        <h1>
+            配置管理
+            <small>
+                <i class="icon-double-angle-right"></i>
+                {{ action }}
+            </small>
+        </h1>
+    </div> /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="col-sm-offset-1 col-sm-6">
+            <form class="form-horizontal" method="post" action="" role="form" id="fl_form">
+                    {% csrf_token %}
+                    {{ wizard.management_form }}
+                    {% if wizard.form.forms %}
+                        {{ wizard.form.management_form }}
+                        {% for form in wizard.form.forms %}
+                            {% bootstrap_form form %}
+{#                            {{ form|bootstrap }}#}
+                        {% endfor %}
+                    {% else %}
+{#                        {{ wizard.form|bootstrap }}#}
+                        {% bootstrap_form wizard.form %}
+                    {% endif %}
+            </form>
+            </div>
+            <div class="col-md-offset-5 col-md-9">
+                <button id="fl_submit" class="btn btn-info" type="button">
+                    <i class="icon-ok bigger-110"></i>
+                    提交
+                </button>
+            </div>
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div>
+{% endblock %}
+{% block custom_foot_js %} 
+<script>
+        $(document).on('click', '#fl_submit', function(){
+          $('#fl_form').submit();
+          return false;
+        })
+</script>
+{% endblock %}

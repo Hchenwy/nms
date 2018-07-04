@@ -1,0 +1,155 @@
+{% load i18n %}
+    <div class="navbar navbar-default" id="navbar">
+        <div class="navbar-container" id="navbar-container">
+          <div class="navbar-header pull-left"> <a href="#" class="navbar-brand"></a> 
+            <!-- /.brand --> 
+          </div>
+          <!-- /.navbar-header -->
+          <div class="navbar-header pull-right" role="navigation">
+            <ul class="nav ace-nav">
+                <li class="light-orange">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                      <i class="icon-bell-alt"></i>
+                      <span class="badge badge-important">8</span>
+                    </a>
+
+                    <ul class="pull-right dropdown-navbar navbar-pink dropdown-menu dropdown-caret dropdown-close">
+                      <li class="dropdown-header">
+                        <i class="icon-warning-sign"></i>
+                        8 Notifications
+                      </li>
+                  
+                      <li>
+                        <a href="#">
+                          <div class="clearfix">
+                            <span class="pull-left">
+                              <i class="btn btn-xs no-hover btn-pink icon-comment"></i>
+                              New Comments
+                            </span>
+                            <span class="pull-right badge badge-info">+12</span>
+                          </div>
+                        </a>
+                      </li>
+                  
+                      <li>
+                        <a href="#">
+                          <i class="btn btn-xs btn-primary icon-user"></i>
+                          Bob just signed up as an editor ...
+                        </a>
+                      </li>
+                  
+                      <li>
+                        <a href="#">
+                          <div class="clearfix">
+                            <span class="pull-left">
+                              <i class="btn btn-xs no-hover btn-success icon-shopping-cart"></i>
+                              New Orders
+                            </span>
+                            <span class="pull-right badge badge-success">+8</span>
+                          </div>
+                        </a>
+                      </li>
+                  
+                      <li>
+                        <a href="#">
+                          <div class="clearfix">
+                            <span class="pull-left">
+                              <i class="btn btn-xs no-hover btn-info icon-twitter"></i>
+                              Followers
+                            </span>
+                            <span class="pull-right badge badge-info">+11</span>
+                          </div>
+                        </a>
+                      </li>
+                  
+                      <li>
+                        <a href="#">
+                          See all notifications
+                          <i class="icon-arrow-right"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+               <li class="light-blue"> 
+                 <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                 <span class="user-info"> {{ user.name }} </span> <i class="icon-caret-down"></i> </a>
+                <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                      {% if user.is_authenticated %}
+                      <li>
+                          <a data-toggle="modal" data-target=".bs-example-modal-lg">
+                            <i class="icon-user"></i>
+                            个人信息
+                          </a>
+                        </li>
+                      {% endif %}
+                      <li class="divider"></li>
+                  <li>
+                      {% if user.is_authenticated %}
+                      <a href="{% url 'users:logout' %}">
+                          <i class="fa fa-sign-out"></i>{% trans 'Logout' %}
+                      </a>
+                      {% else %}
+                      <a href="{% url 'users:login' %}">
+                          <i class="fa fa-sign-in"></i>{% trans 'Login' %}
+                      </a>
+                      {% endif %}
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <!-- /.ace-nav --> 
+          </div>
+          <!-- /.navbar-header --> 
+        </div>
+      </div>
+
+
+
+      <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+          <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                  <div class="modal-header widget-header">
+                      <button type="button" class="bootbox-close-button close" data-dismiss="modal">×</button>
+                      <h4 class="modal-title">个人信息</h4>
+                  </div>
+                  <div class="modal-body">
+                      <table class="table table-striped table-bordered table-hover">
+                          <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>登录名</th>
+                                <th>用户组</th>
+                                <th>权限</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr class="success">
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>
+                                    {% for group in user.groups.all %} {{ group.name }}&nbsp;&nbsp; {% endfor %}
+                                </td>
+                                <td>{{ user.role }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-navy">邮箱</th>
+                                <td class="text-navy">微信</th>
+                                <td class="text-navy">钉钉</th>
+                                <td class="text-navy">创建者</th>
+                            </tr>
+                            <tr class="success">
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.wechat }}</td>
+                                <td>{{ user.dingtalk }}</td>
+                                <td>{{ user.created_by }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+                      <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                  </div>
+              </div>
+          </div>
+        </div>

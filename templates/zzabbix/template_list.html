@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Zalt NMS</title>
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="tabbable">
+                <div class="tab-content no-border padding-lr-24">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="dataTables_length pull-left">
+                                <label><button type="button" class="btn  btn-success " data-toggle="modal" onclick="add_template()"> 新增模板 </button></label>
+                                <label><button type="button" class="btn  btn-purple " data-toggle="modal" onclick="sync_zabbix()"> 同步数据 </button></label>
+                                <label><button type="button" class="btn btn-danger" data-toggle="modal" onclick="del_all_template()"> 删除所选 </button></label>
+                            </div>
+                            <div class="dataTables_length pull-right">
+                                <label>节点选择：
+                                    <select id="father_node" onchange="sel_node()">
+                                        {% for node in node_list %}
+                                            {% if node_id == node.id %}
+                                            <option value="{{ node.id }}" selected="selected">{{ node.name }}</option>
+                                            {% else %}
+                                            <option value="{{ node.id }}">{{ node.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label><input  id="keyword" type="text" class="w210 inputCheck1" placeholder="关键字搜索"></label>
+                                <label><button type="button" class="btn btn-info " onclick="key_search()"> 查询 </button></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xs-12 " >
+                            <table class="table table-striped table-bordered table-hover" align="left">{% csrf_token %}
+                                <thead>
+                                    <tr role="row">
+                                        <th width="30"> <label><input type="checkbox" class="ace" id="select_all"><span class="lbl"></span></label></th>
+                                        <th>模板名称</th>
+                                        <th>所属节点</th>
+                                        <th width="150">监控项</th>
+                                        <th width="150">触发器</th>
+                                        <th width="150">主机</th>
+                                        <th width="60">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl_all"></tbody>
+                            </table>
+                            <div class="col-sm-8 padding-left-0" class="form-inline">
+                                <label id="sel_icon"></label>
+                                <label id="node_num"></label>
+                            </div>
+                            <div class="col-sm-4 padding-right-0">
+                                <div class="dataTables_paginate paging_bootstrap">
+                                    <ul class="pagination" id="page_navi"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 新增、编辑设备 -->
+<div id="addtemplate" class="modal fade in" tabindex="-1" aria-hidden="false">
+    <form id="templateForm" class="form-horizontal" role="form">
+        <input type="hidden" id="templateid" name="templateid" value="0">
+        <div class="modal-dialog" style="width:800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="bootbox-close-button close"
+                        data-dismiss="modal">×</button>
+                    <h4 class="modal-title">编辑模板</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="scroller" data-always-visible="1" data-rail-visible1="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="portlet-body form">
+                                    <div class="form-body">
+                                        <div class="form-group" id="name_div">
+                                            <label class="col-md-2 control-label"><strong class="hint">*</strong>模板名称</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" id="name" name="name"
+                                                    data-bv-notempty="true" data-bv-notempty-message="名称不能为空！"
+                                                    data-bv-stringlength="true" data-bv-stringlength-max="30" data-bv-stringlength-message="长度不能超过30"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">包含主机</label>
+                                            <div class="col-sm-4">
+                                                <select id="hosts_selected"  size="12" class="form-control m-b" multiple></select>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <div class="btn-group" style="margin-top: 70px;">
+                                                    <button type="button" class="btn btn-info" onclick="move('hosts_selected', 'hosts')"><i class="icon-chevron-right"></i></button>
+                                                 </div>
+                                                <div class="btn-group" style="margin-top: 20px;">
+                                                    <button type="button" class="btn btn-info" onclick="move('hosts', 'hosts_selected')"><i class="icon-chevron-left"></i> </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div>
+                                                    <select id="hosts" class="form-control m-b" size="12"  multiple>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">模板描述</label>
+                                            <div class="col-md-9">
+                                                <textarea id="description" name="description" rows="4" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="confirm_template()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block custom_foot_js %}
+<script src="/static/js/bootstrapValidator/js/bootstrapValidator.js"></script>
+<script src="/static/js/zabbix/page_control.js"></script>
+<script >
+/* 新增、编辑模板 */
+//新增模板
+function add_template(template_id) {
+    if (template_id == undefined) template_id = '0'
+
+    $('#templateForm')[0].reset();
+    $("#templateForm").data("bootstrapValidator").resetForm();
+    $('#addtemplate').modal('show');
+
+    //加载主机信息
+    $.post("{% url 'template_get_host' %}", {
+        "node_id" : $('#father_node').val(),
+        "template_id": template_id,
+    }, function(data){
+        json_to_form(data);
+    }, "json");
+}
+//编辑模板
+function edit_template(template_id) {
+    $('#templateid').val(template_id);
+    add_template(template_id);
+}
+//提交表单
+$('#templateForm').bootstrapValidator();
+function confirm_template() {
+    host_id = []
+    $('#hosts_selected option').each(function(){
+        host_id.push($(this).val());
+    });
+
+    $('#templateForm').bootstrapValidator('validate');
+    if(!$("#templateForm").data('bootstrapValidator').isValid()) return false;
+
+    $.post("{% url 'template_add' %}", {
+        "description": $('#description').val(),
+        "name": $('#name').val(),
+        "host_id": host_id.join(","),
+        "template_id": $('#templateid').val(),
+        "node_id" : $('#father_node').val(),
+    }, function(data){
+        $('#addtemplate').modal('hide');
+        alert(data);
+        window.location.reload();
+    });
+}
+//主机移动
+function move(from, to, from_o, to_o) {
+    jQuery("#" + from + " option").each(function () {
+        if (jQuery(this).prop("selected") == true) {
+            jQuery("#" + to).append(this);
+            if( typeof from_o !== 'undefined'){
+                jQuery("#"+to_o).append($("#"+from_o +" option[value='"+this.value+"']"));
+            }
+        }
+    });
+}
+//json转表单
+function json_to_form(data) {
+    var host_sel_list = [];
+    var host_list = [];
+    var host_sel_str = "";
+    var host_str = "";
+    var name = "";
+    var description = "";
+
+    if (data.host_sel_list != undefined)  host_sel_list = data.host_sel_list;
+    if (data.host_list != undefined) host_list = data.host_list;
+    if (data.name != undefined) name = data.name
+    if (data.description != undefined) description = data.description
+
+    $('#name').val(name);
+    $('#description').val(description);
+    $('#hosts_selected').empty();
+    $('#hosts').empty();
+    for(var i=0; i<host_sel_list.length; i++) {
+        host_sel_str += '<option value="' + host_sel_list[i].host_id + '">' + host_sel_list[i].name + '</option>';
+    }
+    $('#hosts_selected').append(host_sel_str);
+
+    for(var i=0; i<host_list.length; i++) {
+        host_str += '<option value="' + host_list[i].host_id + '">' + host_list[i].name + '</option>';
+    }
+    $('#hosts').append(host_str);
+}
+
+/* 删除模板 */
+//删除单个节点
+function del_template(template_id) {
+    if (confirm("确定删除")) {
+        $.post("{% url 'template_del' %}", {
+            "node_id" : $('#father_node').val(),
+            "template_id": template_id,
+        }, function(data){
+            alert(data);
+            window.location.reload();
+        })
+    }
+}
+//全选删除
+$('#select_all').click(function(){
+    var state = $(this).prop("checked");
+    $("input[type='checkbox']").prop("checked", state);
+})
+
+//删除所有节点
+function del_all_template(){
+    console.log();
+    var check_array = [];
+    $("input:checkbox[name='selected']:checked").each(function() {
+        check_array.push(jQuery(this).val());
+    });
+
+    if (check_array.length != 0) {
+        del_template(check_array.join(','));
+    }
+}
+//json转table显示
+function json_to_tbl(obj) {
+    var father_node = $('#father_node').val();
+    $('#tbl_all').empty();
+    if (typeof(obj) == "undefined") {
+        return;
+    }
+    for (var i=0; i<obj.length; i++) {
+        var html_str = ""
+
+        html_str += '<tr><td class="text-center"><label><input type="checkbox" class="ace" name="selected" value="' + obj[i].host_id + '"><span class="lbl"></span> </label></td>';
+        html_str += '<td>' + obj[i].name + '</td>';
+        html_str += '<td>' + obj[i].father_node + '</td>';
+        html_str += '<td><a href="/nodes/item_list/?nodeid=' + father_node + '&hostid=' + obj[i].host_id + '">监控项 </a>' + obj[i].items_num + '</td>';
+        html_str += '<td><a href="/nodes/trigger_list/?nodeid=' + father_node + '&hostid=' + obj[i].host_id + '">触发器 </a>' + obj[i].trigger_num + '</td>';
+        html_str += '<td><a>主机 </a>' + obj[i].host + '</td>';
+        html_str += '<td><div class="visible-md visible-lg hidden-sm hidden-xs action-buttons"><a class="green" title="编辑" data-toggle="modal" onclick="edit_template(' + obj[i].host_id
+            + ')"><i class="icon-pencil bigger-130"></i></a><a class="red" title="删除" data-toggle="modal"  onclick="del_template(' + obj[i].host_id + ')"><i class="icon-trash bigger-130"></i></a></div></td></tr>';
+
+        $('#tbl_all').append(html_str);
+    }
+}
+//ajax 请求表单数据
+function get_node_json(page_id) {
+    var keyword = encodeURI($('#keyword').val());
+    var father_node = $('#father_node').val();
+    var page_size = $('#sel_size').val();
+
+    if (page_size == undefined) page_size = 10;
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url: "/nodes/template_list_json/",
+        async:false,
+        data:{"page_size": page_size,"page_id": page_id, "keyword": keyword, "father_node": father_node},
+    }).done(function(json){
+        console.log(json.host_list);
+        json_to_tbl(json.host_list);
+        show_page_navi(page_id, json.page_num);
+        show_node_num(json.host_num);
+    });
+}
+//翻页
+function change_page(page_id) {
+    get_node_json(page_id);
+}
+//关键字搜索
+function key_search() {
+    get_node_json(1);
+}
+//节点选择
+function sel_node() {
+    get_node_json(1);
+}
+//同步zabbix数据
+function sync_zabbix() {
+    if (confirm("确定同步全量数据？")) {
+        $.post("{% url 'template_sync_zabbix' %}", {
+            "node_id": $('#father_node').val(),
+        }, function(data){
+            alert(data);
+            window.location.reload();
+        });
+    }
+}
+//mian函数
+$(function(){
+    console.log();
+    get_node_json(1);
+    show_sel_icon();
+    $("#sel_size").bind("change",function(){    //监听分页选择
+        if($(this).val()==0){
+          return;
+        }
+        else{
+            get_node_json(1);
+        }
+    });
+})
+</script>
+{% endblock %}

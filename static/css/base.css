@@ -1,0 +1,65 @@
+select, input{ height: 32px; }
+a { cursor: pointer; }
+.input-group .form-control { width: 100%; }
+.calendar { background: #fff; border-left: transparent; }
+.dataTables_length label button { margin-right: 5px; }
+.dataTables_length label button:last-child,.dataTables_length label:last-child{ margin-right: 0px; }
+.roleztree { height: 200px; width: 100%; border: #ddd solid 1px; overflow: scroll; }
+.table>tbody>tr>td input { height: 25px; width: 50px; }
+/*fa-icon*/
+.fa.fa-audit{background: url(../images/audit.png) no-repeat;height: 16px;width: 16px;}
+/*model*/
+.modal .form-inline a.text-danger:hover{color: red;}
+.hint { padding: 5px; color: red; }
+.modal p.hint {margin-bottom: -13px;}
+.icon-info-sign { padding: 0 5px 0; color: #4b89aa;line-height: 32px; }
+.custom { width:50%; }
+.custom1{width: 824px;padding-bottom: 0;}
+.custom1 .modal-body{padding:20px 20px 5px ;}
+.custom .checkbox>label,.checkbox>label>.lbl{margin-right: 15px;min-width: 160px !important;}
+.nodemodel,.nodemodel1,.nodemodel2{height: 200px;border: 1px solid #ddd;overflow: auto;}
+.severlabel { float: right; }
+.border { border: #DDDDDD solid 1px; }
+.border-b { border-bottom: #DDDDDD solid 1px; }
+.light-blue3 { background-color: #eff3f8; }
+.contact-left { background: #eff3f8; overflow-y: auto; }
+.ztree-none { z-index: 1050; height: 200px; width: 50%; border: #ddd solid 1px; overflow: auto; display: none; }
+.pagination li:last-child{margin-left: 10px;}
+.nodeTree{position: absolute;top:33px;right: 0;height: 200px;width: 205px;border: 1px solid #ddd;background: white;z-index: 9999;overflow: auto;}
+.checkboxli>label>.lbl{min-width:50px !important;}
+.labels p{margin: 10px 0 5px 0;}
+.padding-right-0>.dataTables_length label{margin-right: 0;}
+@media screen and (max-width: 1920px) {
+.checkbox>label { margin-right: 35px; }
+.fa-calendar { position: absolute; right:25px;top: 10px; }
+.nodeTree{right: 18px;}
+.dataTables_length label input,.dataTables_length label select{margin-right: 18px; }
+.inquiry_length label input,.inquiry_length label select{margin-right: 13px; }
+}
+@media screen and (max-width: 1659px) {
+.checkbox>label { margin-right: 25px; }
+
+}
+@media screen and (max-width: 1439px) {
+.checkbox>label { margin-right: 20px; }
+.fa-calendar { position: absolute; right:10px;top: 10px; }
+.dataTables_length label input,.dataTables_length label select {margin-right: 5px; }
+}
+.sillfrom{margin-top: 10px;}
+.sillfrom>.form-group{margin-bottom: 0;}
+/*表格的超出隐藏*/
+.table-fixed{table-layout: fixed;}
+.table-fixed>tbody>tr>td{white-space: nowrap !important;overflow: hidden;text-overflow: ellipsis;}
+.table-fixed span.cursor{cursor: pointer;}
+#itemMenu.nav-tabs>li{width:inherit}
+.echarts{height:300px;padding-top: 5px;text-align: center;line-height: 300px;}
+/*拓扑图上的table*/
+.netwarkTable{position:absolute;z-index:1;left:190px;height: 216px;width: 600px;bottom:10px;}
+
+.table>tbody>tr.orange>td{background:#e7d6cd;border-color:#e7d6cd}
+.table>tbody>tr.info>td{background:#e0e9ec;border-color:#e0e9ec}
+
+/*.netwarkTable .table>tbody>tr:nth-child(even)>td,.netwarkTable .table>tbody>tr:nth-child(even)>th{background-color: #fff;}*/
+
+.ztree {overflow:auto;margin:0;_margin-top:10px;padding:10px 0 0 10px;height:100%}
+		.ztree li span.button.add {margin-left:2px; margin-right: -1px; background-position:-144px 0; vertical-align:top; *vertical-align:middle}

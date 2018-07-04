@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block title %}
+<title>网管系统_首次登录</title>
+{% endblock %}
+{% block content %}
+<div class="page-content">
+    <!--<div class="page-header">
+        <h1>
+            配置管理
+            <small>
+                <i class="icon-double-angle-right"></i>
+                {{ action }}
+            </small>
+        </h1>
+    </div> /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="col-md-12">
+                <div class="col-xs-12 col-sm-6 widget-container-span ui-sortable">
+                    <div class="widget-box">
+                        <div class="widget-header">
+                            <h5>欢迎使用</h5>
+                
+                            <div class="widget-toolbar">
+                                <a href="#" data-action="settings">
+                                    <i class="icon-cog"></i>
+                                </a>
+                
+                                <a href="#" data-action="reload">
+                                    <i class="icon-refresh"></i>
+                                </a>
+                
+                                <a href="#" data-action="collapse">
+                                    <i class="icon-chevron-up"></i>
+                                </a>
+                
+                                <a href="#" data-action="close">
+                                    <i class="icon-remove"></i>
+                                </a>
+                            </div>
+                        </div>
+                
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <p class="alert alert-warning">
+                                    欢迎使用网管系统， 点击<a href="{{ user_guide_url }}" target="_blank">用户向导</a>查看更多信息。
+                                </p>
+                                <p class="alert alert-success">
+                                    Raw denim you probably haven't heard of them jean shorts Austin.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div>
+{% endblock %}
+{% block custom_foot_js %} 
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %} {% load static %} {% load i18n %} {% load bootstrap3 %} {% block title %}
+<title>网管系统_首次登录</title>
+{% endblock %} {% block custom_head_css %}
+<link rel="stylesheet" href="{% static " css/chosen.css " %}" /> {% endblock %} {% block content %}
+<div class="page-content">
+
+    <h3 class="header smaller red">
+        <b>用户组详情: {{ user_group.name }}</b>
+    </h3>
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="col-xs-4 col-sm-3 pricing-span-header">
+                <div class="widget-box transparent">
+
+                    <div class="widget-body">
+                        <div class="widget-main no-padding">
+                            <ul class="list-unstyled list-striped pricing-table-header">
+                                <li>名称：
+                                    <b>{{ user_group.name }}</b>
+                                </li>
+                                <li>创建者：
+                                    <b>{{ user_group.created_by }}</b>
+                                </li>
+                                <li>创建日期：
+                                    <b>{{ user_group.date_created }}</b>
+                                </li>
+                                <li>备注：
+                                    <b> {{ user_group.comment }}</b>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</div>
+{% endblock %} {% block custom_foot_js %}
+
+<script src="{% static " js/chosen.jquery.min.js " %}"></script>
+<script>
+    jQuery(function ($) {
+
+        $(".chosen-select").chosen();
+        $('#chosen-multiple-style').on('click', function (e) {
+            var target = $(e.target).find('input[type=radio]');
+            var which = parseInt(target.val());
+            if (which == 2) $('#form-field-select-4').addClass('tag-input-style');
+            else $('#form-field-select-4').removeClass('tag-input-style');
+        });
+    });
+</script>
+
+{% endblock %}

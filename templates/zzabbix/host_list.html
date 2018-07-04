@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Zalt NMS</title>
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="tabbable">
+                <div class="tab-content no-border padding-lr-24">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="dataTables_length pull-left">
+                                <label><button type="button" class="btn  btn-success " data-toggle="modal" onclick="add_host()"> 新增设备 </button></label>
+                                <label><button type="button" class="btn  btn-purple " data-toggle="modal" onclick="sync_zabbix()"> 同步数据 </button></label>
+                                <label><button type="button" class="btn btn-danger" data-toggle="modal" onclick="del_all_host()"> 删除所选 </button></label>
+                            </div>
+                            <div class="dataTables_length pull-right">
+                                <label>节点选择：
+                                    <select id="father_node" onchange="sel_node()">
+                                        {% for node in node_list %}
+                                            {% if node_id == node.id %}
+                                            <option value="{{ node.id }}" selected="selected">{{ node.name }}</option>
+                                            {% else %}
+                                            <option value="{{ node.id }}">{{ node.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label>群组选择：
+                                    <select id="group" onchange="sel_group()">
+                                        <option value="0">所有</option>
+                                        {% for group in groups_list %}
+                                            {% if group_id == group.id %}
+                                            <option value="{{ group.id }}" selected="selected">{{ group.name }}</option>
+                                            {% else %}
+                                            <option value="{{ group.id }}">{{ group.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label><input  id="keyword" type="text" class="w210 inputCheck1" placeholder="关键字搜索"></label>
+                                <label><button type="button" class="btn btn-info " onclick="key_search()"> 查询 </button></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xs-12 " >
+                            <table class="table table-striped table-bordered table-hover" align="left">
+                                <thead>
+                                    <tr role="row">
+                                        <th width="30"> <label><input type="checkbox" class="ace" id="select_all"><span class="lbl"></span></label></th>
+                                        <th>设备名称</th>
+                                        <th>设备 IP</th>
+                                        <th>设备类型</th>
+                                        <th>所属节点</th>
+                                        <th width="100">监控项</th>
+                                        <th width="100">触发器</th>
+                                        <th width="100"> 模板 </th>
+                                        <th width="80">状态</th>
+                                        <th width="80">客户端</th>
+                                        <th width="150">更新时间</th>
+                                        <th width="60">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl_all"></tbody>
+                            </table>
+                            <div class="col-sm-8 padding-left-0" class="form-inline">
+                                <label id="sel_icon"></label>
+                                <label id="node_num"></label>
+                            </div>
+                            <div class="col-sm-4 padding-right-0">
+                                <div class="dataTables_paginate paging_bootstrap">
+                                    <ul class="pagination" id="page_navi"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 新增、编辑设备 -->
+<div id="addhost" class="modal fade in" tabindex="-1" aria-hidden="false">
+    <form id="hostForm" class="form-horizontal" role="form">
+        <input type="hidden" id="hostid" name="hostid" value="0">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="bootbox-close-button close"
+                        data-dismiss="modal">×</button>
+                    <h4 class="modal-title">编辑设备</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="scroller" data-always-visible="1" data-rail-visible1="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="portlet-body form">
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"><strong class="hint">*</strong>设备类型</label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" id="type" name="type" onchange="sel_device_type()">
+                                                <option value="2">交换机</option>
+                                                <option value="1">服务器</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" id="name_div">
+                                        <label class="col-md-3 control-label"><strong class="hint">*</strong>设备名称</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" id="name" name="name"
+                                                data-bv-notempty="true" data-bv-notempty-message="名称不能为空！"
+                                                data-bv-stringlength="true" data-bv-stringlength-max="30" data-bv-stringlength-message="长度不能超过30"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"><strong class="hint">*</strong>IP</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" id="ip" name="ip"
+                                                data-bv-notempty="true" data-bv-notempty-message="ip不能为空！"
+                                                data-bv-regexp="true"
+                                                data-bv-regexp-regexp="^((25[0-5]|2[0-4]\d|[01]?\d\d?)($|(?!\.$)\.)){4}$"
+                                                data-bv-regexp-message="请输入正确的IP地址" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"><strong class="hint">*</strong>设备端口</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" id="port"
+                                                name="port" data-bv-notempty="true"
+                                                data-bv-notempty-message="端口不能为空！" data-bv-regexp="true"
+                                                data-bv-regexp-regexp="(^[1-9]\d{0,3}$)|(^[1-5]\d{4}$)|(^6[0-4]\d{3}$)|(^65[0-4]\d{2}$)|(^655[0-2]\d$)|(^6553[0-5]$)"
+                                                data-bv-regexp-message="请输入正确的服务器端口" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                            <label class="col-md-3 control-label"><strong class="hint">*</strong>设备状态</label>
+                                            <div class="col-md-9">
+                                                <label class="margin-right-10">
+                                                    <input name="status" type="radio" class="ace" value="0"  data-bv-notempty="true" data-bv-notempty-message="请选择状态！" >
+                                                    <span class="lbl">&nbsp;正常使用</span>
+                                                </label>
+                                                <label class="margin-right-10">
+                                                    <input name="status" type="radio" class="ace" value="1"  data-bv-notempty="true" data-bv-notempty-message="请选择状态！" >
+                                                    <span class="lbl">&nbsp;暂停使用</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    <!-- 交换机需要填写的信息 -->
+                                    <div id="macroParam">
+                                        <div class="form-group">
+                                            <div class="col-md-6 text-center">宏变量（Macro）</div>
+                                            <div class="col-md-6 text-left">值（Value）</div>
+                                        </div>
+                                        <div class="form-inline" id="usemacro">
+                                            <input type="text" class="margin-left-50" name="macro"
+                                                data-bv-field="keys" data-bv-regexp="true"
+                                                data-bv-regexp-regexp="(^[_A-Z0-9\.]+$)"
+                                                data-bv-regexp-message="宏只能输入数字，字母，下划线和小数点!"> - <input
+                                                type="text" name="value" data-bv-field="value">
+                                        </div>
+                                        <div class="form-inline margin-top-10" id="addMacroBtn">
+                                            <button type="button" class="btn btn-info margin-left-50" onclick="add_usemacro()">添加</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="confirm_host()">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+{% block custom_foot_js %}
+<script src="/static/js/bootstrapValidator/js/bootstrapValidator.js"></script>
+<script src="/static/js/zabbix/page_control.js"></script>
+<script >
+/* 新增、编辑设备 */
+//模态框reset
+function reset(){
+    $('#hostForm')[0].reset();
+    $("#hostForm").data("bootstrapValidator").resetForm();
+    $('#hostid').val('0');
+    //$("input[type='radio']").attr("checked", false);
+    //$("input[type='radio'][value='0']").attr("checked", true);
+    $('#type option').attr("selected", false);
+}
+//新增设备
+function add_host() {
+    reset();
+    sel_device_type();
+    $('#addhost').modal('show');
+}
+//json转parameter
+function json_to_param(data) {
+    if (data.name != undefined) $('#name').val(data.name);
+    if (data.ip != undefined) $('#ip').val(data.ip);
+    if (data.port != undefined) $('#port').val(data.port);
+    if (data.type != undefined) {
+        $('#type option[value="'+ data.type +'"]').attr("selected", true);
+    }
+    if (data.status != undefined) {
+        $("input[type='radio'][value='" + data.status + "']").attr("checked", true);
+    }
+}
+//编辑设备
+function edit_host(host_id) {
+    var node_id = $('#father_node').val();
+    if (host_id == undefined) return false;
+
+    $.post("{% url 'host_edit' %}", {
+        "node_id": node_id,
+        "host_id": host_id,
+    }, function(data){
+        reset();
+        $('#hostid').val(host_id);
+        json_to_param(data);
+        sel_device_type();
+        $('#addhost').modal('show');
+    }, "json");
+
+}
+//选择设备类型事件
+function sel_device_type() {
+    var type = $('#type').val();
+
+    if (type == "1") {
+        //$('#name_div').css("display", "block");
+        $('#macroParam').css("display", "none");
+    } else if (type == "2") {
+        //$('#name_div').css("display", "none");
+        $('#macroParam').css("display", "block");
+    }
+}
+//删除marco
+function del_self(obj) {
+    $(obj).parent().remove();
+}
+//添加marco
+function add_usemacro() {
+    var html = '<a class="margin-left-5 text-danger" onclick="del_self(this);" >删除</a>';
+    var line = $('#usemacro').clone();
+    $(line).find("input").eq(1).after(html);
+    $('#addMacroBtn').before(line);
+}
+//提交表单
+$('#hostForm').bootstrapValidator();
+function confirm_host() {
+    var macro = '';
+    var value = '';
+    var name = $('#name').val();;
+    var type = $('#type').val();
+    var ip = $('#ip').val();
+    var port = $('#port').val();
+    var node_id = $('#father_node').val();
+    var host_id = $('#hostid').val();
+    var status = $('input[name="status"]:checked').val();
+
+    if (type == "2") {
+        var macro_arr = [];
+        var value_arr = [];
+
+        $("input[name='macro']").each(function(){
+            macro_arr.push($(this).val());
+        });
+        $("input[name='value']").each(function(){
+            value_arr.push($(this).val());
+        });
+        macro = macro_arr.join(',');
+        value = value_arr.join(',');
+    }
+    $('#hostForm').bootstrapValidator('validate');
+    if($("#hostForm").data('bootstrapValidator').isValid()) {
+        $.post("{% url 'host_add' %}", {
+            "host_id": host_id,
+            "node_id": node_id,
+            "status": status,
+            "type": type,
+            "name": name,
+            "ip": ip,
+            "port": port,
+            "macro": macro,
+            "value": value,
+        }, function(data){
+            if (data != '') alert(data);
+            $('#addhost').modal('hide');
+            window.location.reload();
+        });
+    }
+}
+//删除单个节点
+function del_host(host_id) {
+    if (confirm("确定删除")) {
+        $.post("{% url 'host_del' %}", {
+            "node_id": $('#father_node').val(),
+            "host_id": host_id,
+        }, function(data){
+            alert(data);
+            window.location.reload();
+        })
+    }
+}
+//全选删除
+$('#select_all').click(function(){
+    var state = $(this).prop("checked");
+    $("input[type='checkbox']").prop("checked", state);
+})
+
+//删除所有节点
+function del_all_host() {
+    var check_array = [];
+
+    $("input:checkbox[name='selected']:checked").each(function() {
+        check_array.push(jQuery(this).attr("value"));
+    });
+    if (check_array.length != 0) {
+        host_id = check_array.join(",");
+        del_host(host_id);
+    }
+}
+//json转table显示
+function json_to_tbl(obj) {
+    var father_node = $('#father_node').val();
+    $('#tbl_all').empty();
+    if (typeof(obj) == "undefined") {
+        return;
+    }
+    for (var i=0; i<obj.length; i++) {
+        var html_str = ""
+
+        html_str += '<tr><td class="text-center"><label><input type="checkbox" class="ace" name="selected" value="' + obj[i].host_id + '"><span class="lbl"></span> </label></td>';
+        html_str += '<td>' + obj[i].name + '</td>';
+        html_str += '<td>' + obj[i].ip + '</td>';
+        if (obj[i].type == 1) html_str += '<td>服务器</td>';
+        else if (obj[i].type == 2) html_str += '<td>交换机</td>';
+        else html_str += '<td>未知类型</td>';
+        html_str += '<td>' + obj[i].father_node + '</td>';
+        html_str += '<td><a href="/nodes/item_list/?nodeid=' + father_node + '&hostid=' + obj[i].host_id + '">监控项 </a>' + obj[i].items_num + '</td>';
+        html_str += '<td><a href="/nodes/trigger_list/?nodeid=' + father_node + '&hostid=' + obj[i].host_id + '">触发器 </a>' + obj[i].trigger_num + '</td>';
+        html_str += '<td><a>模板 </a>' + obj[i].template + '</td>';
+        if (obj[i].status == 0)
+            html_str += '<td><span class="label label-sm label-success">正常监控</span></td>';
+        else
+            html_str += '<td><span class="label label-sm label-default">暂停监控</span></td>';
+        if (obj[i].available == 1)
+            html_str += '<td><span class="label label-sm label-success">在线</span></td>';
+        else
+            html_str += '<td><span class="label label-sm label-danger">离线</span></td>';
+        html_str += '<td>' + obj[i].time + '</td>';
+        html_str += '<td><div class="visible-md visible-lg hidden-sm hidden-xs action-buttons"><a class="green" title="编辑" data-toggle="modal" onclick="edit_host(' + obj[i].host_id
+            + ')"><i class="icon-pencil bigger-130"></i></a><a class="red" title="删除" data-toggle="modal"  onclick="del_host(' + obj[i].host_id + ')"><i class="icon-trash bigger-130"></i></a></div></td></tr>';
+
+        $('#tbl_all').append(html_str);
+    }
+}
+//ajax 请求表单数据
+function get_node_json(page_id) {
+    var keyword = encodeURI($('#keyword').val());
+    var father_node = $('#father_node').val();
+    var group_id = $('#group').val();
+    var page_size = $('#sel_size').val();
+
+    if(page_size == undefined) page_size="10";
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url: "/nodes/host_list_json/",
+        async:false,
+        data:{"page_size": page_size,"page_id": page_id, "keyword": keyword, "father_node": father_node, "group_id":group_id},
+    }).done(function(json){
+        json_to_tbl(json.host_list);
+        show_page_navi(page_id, json.page_num);
+        show_node_num(json.host_num);
+    });
+}
+//翻页
+function change_page(page_id) {
+    get_node_json(page_id);
+}
+//节点选择
+function sel_node() {
+    var father_node = $('#father_node').val();
+    location.href = "{% url 'host_list' %}?nodeid=" + father_node + "&groupid=0";
+}
+//群组选择
+function sel_group() {
+    var father_node = $('#father_node').val();
+    var group_id = $('#group').val();
+    location.href = "{% url 'host_list' %}?nodeid=" + father_node + "&groupid=" + group_id;
+}
+//关键字搜索
+function key_search() {
+    get_node_json(1);
+}
+//同步zabbix数据
+function sync_zabbix() {
+    if (confirm("确定同步全量数据？")) {
+        $.post("{% url 'host_sync_zabbix' %}", {
+            "node_id": $("#father_node").val(),
+        },function(data){
+            alert(data);
+            window.location.reload();
+        });
+    }
+}
+//mian函数
+$(function(){
+    var node_num = 100;
+    get_node_json(1);
+    show_sel_icon();
+    $("#sel_size").bind("change",function(){    //监听分页选择
+        if($(this).val()==0){
+          return;
+        }
+        else{
+            get_node_json(1);
+        }
+    });
+})
+</script>
+{% endblock %}

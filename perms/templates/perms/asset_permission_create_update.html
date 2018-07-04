@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block title %}
+<title>网管系统_设备权限</title>
+{% endblock %}
+{% block custom_head_css %}
+<link rel="stylesheet" href="{% static "css/chosen.css" %}" />
+{% endblock %}
+{% block content %}
+<div class="page-content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+               {{ form.non_field_errors }}
+            </div>
+       {% endif %}
+       <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
+           {% csrf_token %}
+           <h3 class="lighter block blue col-xs-1" >{% trans '名称' %}</h3>
+           <div class="col-xs-6">
+           {% bootstrap_field form.name layout="horizontal" %}
+           </div>
+            <div class="hr hr-24 col-xs-12"></div>
+           <h3 class="lighter block blue col-xs-1">{% trans '用户' %}</h3>
+           <div class="col-xs-6">
+           {% bootstrap_field form.users layout="horizontal" %}
+           {% bootstrap_field form.user_groups layout="horizontal" %}
+           </div>
+            <div class="hr hr-24 col-xs-12"></div>
+           <h3 class="lighter block blue col-xs-1">{% trans '资产' %}</h3>
+           <div class="col-xs-6">
+           {% bootstrap_field form.assets layout="horizontal" %}
+           {% bootstrap_field form.asset_groups layout="horizontal" %}
+           </div>
+            <div class="hr hr-24 col-xs-12"></div>
+           <h3 class="lighter block blue col-xs-1">{% trans '其它' %}</h3>
+           <div class="col-xs-6">
+           {% bootstrap_field form.is_active layout="horizontal" %}
+           {% bootstrap_field form.comment layout="horizontal" %}
+             <div class="form-group {% if form.date_expired.errors %} has-error {% endif %}" id="date_5">
+               <label for="{{ form.date_expired.id_for_label }}" class="col-md-3 control-label">{{ form.date_expired.label }}</label>
+               <div class="col-sm-8">
+                   <div class="input-group date">
+                       <span class="input-group-addon"><i class="icon-calendar bigger-110"></i></span>
+                       <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'Y-m-d' }}">
+                   </div>
+                   <span class="help-block ">{{ form.date_expired.errors }}</span>
+               </div>
+             </div>
+           </div>
+           </div>
+           <div class="hr-line-dashed col-xs-12"></div>
+           <div class="form-group">
+               <div class="col-sm-4 col-sm-offset-6">
+                   <button class="btn btn-default" type="reset">{% trans '重置' %}</button>
+                   <button id="submit_button" class="btn btn-primary" type="submit">{% trans '提交' %}</button>
+               </div>
+           </div>
+       </form>
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div>
+{% endblock %}
+{% block custom_foot_js %} 
+<script src="{% static "js/chosen.jquery.min.js" %}"></script>
+<script>
+        $(".chosen-select").chosen(); 
+		$('#chosen-multiple-style').on('click', function(e){
+			var target = $(e.target).find('input[type=radio]');
+			var which = parseInt(target.val());
+			if(which == 2) $('#id_groups').addClass('tag-input-style');
+			 else $('#id_groups').removeClass('tag-input-style');
+		});
+
+</script>
+
+{% endblock %}

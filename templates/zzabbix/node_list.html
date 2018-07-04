@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Zalt NMS</title>
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="tabbable">
+                <div class="tab-content no-border padding-lr-24">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="dataTables_length pull-left">
+                                <label><button type="button" class="btn  btn-success " data-toggle="modal" onclick="add_node()"> 新增节点 </button></label>
+                                <label><button type="button" class="btn btn-danger" data-toggle="modal" id="del_all"> 删除所选 </button></label>
+                            </div>
+                            <div class="dataTables_length pull-right">
+                                <label><input  id="keyword" type="text" class="w210 inputCheck1" placeholder="关键字搜索"></label>
+                                <label><button type="button" class="btn btn-info " onclick="key_search()"> 查询 </button></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xs-12 ">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr role="row">
+                                    <th width="30"> <label><input type="checkbox" class="ace" id="select_all"><span class="lbl"></span></label></th>
+                                    <th>节点名称</th>
+                                    <th>主机数量</th>
+                                    <th>模板数量</th>
+                                    <th>告警数量</th>
+                                    <th>Zalt状态</th>
+                                    <th>创建时间</th>
+                                    <th width="80">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl_all"></tbody>
+                        </table>
+                        <div class="col-sm-8 padding-left-0" class="form-inline">
+                            <label id="sel_icon"></label>
+                            <label id="node_num"></label>
+                        </div>
+                        <div class="col-sm-4 padding-right-0">
+                            <div class="dataTables_paginate paging_bootstrap">
+                                <ul class="pagination" id="page_navi"></ul>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="addNode" class="modal fade in"  tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog" style="width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="bootbox-close-button close" data-dismiss="modal">×</button>
+                <h4 class="modal-title">编辑节点</h4>
+            </div>
+            <div class="modal-body">
+                <div style="height:500px;">
+                    <div class="scroller" data-always-visible="1" data-rail-visible1="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" role="form" id="confirmNode">
+                                        <input type="hidden" id="nodeid" name="nodeid" value="0">
+                                        <div class="form-group">
+                                            <label class="col-md-1 control-label"><strong class="hint">*</strong>名称</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control" id="name" name="name" value=""
+                                                    data-bv-notempty="true" data-bv-notempty-message="节点名称不能为空！"
+                                                    data-bv-stringlength="true" data-bv-stringlength-max="30" data-bv-stringlength-message="长度不能超过30个字符"/>
+                                            </div>
+                                            <label class="col-md-1 control-label">地址</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control" id="address" name="address" value=""/>
+                                            </div>
+                                            <label class="col-md-1 control-label">带宽</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control" id="bandwidth" name="bandwidth" value=""/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-1 control-label">运营商</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control" id="operator" name="operator" value=""/>
+                                            </div>
+                                            <label class="col-md-1 control-label">联系人</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control" id="contacts" name="contacts" value=""/>
+                                            </div>
+                                            <label class="col-md-1 control-label">电话</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control" id="phone" name="phone" value=""/>
+                                            </div>
+                                        </div><HR>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label"><strong class="hint">*</strong>Zalt 用户</label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="zbx_user" name="zbx_user" value=""
+                                                    data-bv-notempty="true" data-bv-notempty-message="Zalt 用户不能为空！"/>
+                                            </div>
+                                            <label class="col-md-2 control-label"><strong class="hint">*</strong>Zalt 密码</label>
+                                            <div class="col-md-4">
+                                                <input type="password" class="form-control" id="zbx_passwd" name="zbx_passwd" value=""
+                                                    data-bv-notempty="true" data-bv-notempty-message="Zalt 密码不能为空！"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label"><strong class="hint">*</strong>Zalt IP</label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="zbx_ip" name="zbx_ip" value=""
+                                                    data-bv-notempty="true" data-bv-notempty-message="Zalt IP不能为空！"
+                                                    data-bv-regexp="true" data-bv-regexp-regexp="^((25[0-5]|2[0-4]\d|[01]?\d\d?)($|(?!\.$)\.)){4}$"
+                                                    data-bv-regexp-message="请输入正确的IP地址"/>
+                                            </div>
+                                            <label class="col-md-2 control-label"><strong class="hint">*</strong>Zalt URL</label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="zbx_url" name="zbx_url" value=""
+                                                    data-bv-notempty="true" data-bv-notempty-message="Zalt URL 不能为空！"
+                                                    data-bv-regexp="true" data-bv-regexp-regexp="^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?"
+                                                    data-bv-regexp-message="请输入正确的URL"/>
+                                            </div>
+                                        </div><HR>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label"><strong class="hint">*</strong>Mysql用户</label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="zbx_mysql_user" name="zbx_mysql_user" value=""
+                                                    data-bv-notempty="true" data-bv-notempty-message="Mysql用户名不能为空！"/>
+                                            </div>
+                                            <label class="col-md-2 control-label"><strong class="hint">*</strong>Mysql密码</label>
+                                            <div class="col-md-4">
+                                                <input type="password" class="form-control" id="zbx_mysql_passwd" name="zbx_mysql_passwd" value=""
+                                                    data-bv-notempty="true" data-bv-notempty-message="Mysql密码不能为空！"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label"><strong class="hint">*</strong>Mysql数据库</label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="zbx_mysql_db" name="zbx_mysql_db" value=""
+                                                    data-bv-notempty="true" data-bv-notempty-message="Mysql数据库不能为空！"/>
+                                            </div>
+                                            <label class="col-md-2 control-label">Mysql主机</label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="zbx_mysql_host" name="zbx_mysql_host" value=""
+                                                    data-bv-regexp="true" data-bv-regexp-regexp="^((25[0-5]|2[0-4]\d|[01]?\d\d?)($|(?!\.$)\.)){4}$"
+                                                    data-bv-regexp-message="请输入正确的IP地址"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">Mysql端口</label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="zbx_mysql_port" name="zbx_mysql_port" value="3306"/>
+                                            </div>
+                                        </div><HR>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">备注信息</label>
+                                            <div class="col-md-10">
+                                                <textarea id="comment" name="comment" rows="4" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="confirm_node()">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block custom_foot_js %}
+<script src="/static/js/zabbix/page_control.js"></script>
+<script src="/static/js/bootstrapValidator/js/bootstrapValidator.js"></script>
+<script>
+//新增节点
+function add_node() {
+    $('#confirmNode')[0].reset();
+    $("#confirmNode").data("bootstrapValidator").resetForm();
+    $('#nodeid').val('0');
+    $('#addNode').modal('show');
+}
+//提交表单
+$('#confirmNode').bootstrapValidator();
+function confirm_node() {
+    var form_list = $('#confirmNode').serialize();
+
+    $('#confirmNode').bootstrapValidator('validate');
+    if($("#confirmNode").data('bootstrapValidator').isValid()) {
+        $.get("{% url 'node_add' %}?" + form_list, {}, function(data){
+            alert(data);
+            $('#addNode').modal('hide');
+            window.location.reload();
+        });
+    }
+}
+//json to form
+function json_to_form(data) {
+    if (data.name != undefined) $('#name').val(data.name);
+    if (data.address != undefined) $('#address').val(data.address);
+    if (data.bandwidth != undefined) $('#bandwidth').val(data.bandwidth);
+    if (data.operator != undefined) $('#operator').val(data.operator);
+    if (data.contacts != undefined) $('#contacts').val(data.contacts);
+    if (data.comment != undefined) $('#comment').val(data.comment);
+    if (data.phone != undefined) $('#phone').val(data.phone);
+    if (data.zbx_ip != undefined) $('#zbx_ip').val(data.zbx_ip);
+    if (data.zbx_user != undefined) $('#zbx_user').val(data.zbx_user);
+    if (data.zbx_passwd != undefined) $('#zbx_passwd').val(data.zbx_passwd);
+    if (data.zbx_url != undefined) $('#zbx_url').val(data.zbx_url);
+    if (data.zbx_mysql_user != undefined) $('#zbx_mysql_user').val(data.zbx_mysql_user);
+    if (data.zbx_mysql_passwd != undefined) $('#zbx_mysql_passwd').val(data.zbx_mysql_passwd);
+    if (data.zbx_mysql_db != undefined) $('#zbx_mysql_db').val(data.zbx_mysql_db);
+    if (data.zbx_mysql_host != undefined) $('#zbx_mysql_host').val(data.zbx_mysql_host);
+    if (data.zbx_mysql_port != undefined) $('#zbx_mysql_port').val(data.zbx_mysql_port);
+}
+//编辑节点
+function edit_node(node_id) {
+    add_node();
+
+    $.post("{% url 'node_edit' %}", {
+        "node_id": node_id,
+    }, function(json){
+        json_to_form(json);
+        $('#nodeid').val(node_id);
+    }, "json");
+}
+//同步节点的所有数据（主机、模板、监控项、触发器）
+function sync_all(node_id) {
+    if(confirm("确定同步该节点的所有数据？")){
+        $.post("{% url 'sync_zabbix_all' %}", {
+            "node_id": node_id,
+        }, function(data){
+            alert(data);
+        });
+    }
+}
+//删除单个节点
+function del_node(id) {
+    if (confirm("确定删除")) {
+        $.ajax({
+            type:'get',
+            url:"/nodes/node_del/?id=" + id,
+            data:{},
+        }).done(function(data){
+            alert(data);
+            window.location.reload();
+        })
+    }
+}
+//全选删除
+$('#select_all').click(function(){
+    var state = $(this).prop("checked");
+    $("input[type='checkbox']").prop("checked", state);
+})
+
+//删除所有节点
+$('#del_all').click(function(){
+    var check_array = [];
+    if (confirm("确定删除")) {
+        $("input:checkbox[name='selected']:checked").each(function() {
+            check_array.push(jQuery(this).attr("value"))
+        });
+        if (check_array.length != 0) {
+            jQuery.get("{% url 'node_del' %}",
+            {id: check_array.join(",")},
+            function(result){
+                alert(result);
+                window.location.reload();
+            })
+        }
+
+    }
+});
+//json转table显示
+function json_to_tbl(obj) {
+    $('#tbl_all').empty();
+    for (var i=0; i<obj.length; i++) {
+        var html_str = ""
+
+        html_str += '<tr><td class="text-center"><label><input type="checkbox" class="ace" name="selected" value="' + obj[i].id + '"><span class="lbl"></span> </label></td>';
+        html_str += '<td>' + obj[i].name + '</td>';
+        html_str += '<td><a href="/nodes/host_list/?nodeid=' + obj[i].id + '&groupid=0">' + obj[i].host_num + '</a></td>';
+        html_str += '<td><a href="/nodes/template_list/?nodeid=' + obj[i].id + '">' + obj[i].template_num + '</a></td>';
+        html_str += '<td><a href="/alert/alert_list/?nodeid=' + obj[i].id + '&hostid=0&priority=0">' + obj[i].alert_num + '</td>';
+         if (obj[i].zbx_status == 1) html_str += '<td><span class="label label-sm label-success">在线</span></td>';
+        else if (obj[i].zbx_status == 2) html_str += '<td><span class="label label-sm label-default">离线</span></td>';
+        else html_str += '<td><span class="label label-sm label-danger">未知状态</span></td>';
+        html_str += '<td>' + obj[i].date_added + '</td>';
+        html_str += '<td><div class="visible-md visible-lg hidden-sm hidden-xs action-buttons"><a class="blue" title="同步数据" data-toggle="modal" onclick="sync_all(' + obj[i].id
+            + ')"><i class="icon-download bigger-130"></i></a><a class="green" title="编辑" data-toggle="modal" onclick="edit_node(' + obj[i].id
+            + ')"><i class="icon-pencil bigger-130"></i></a><a class="red" title="删除" data-toggle="modal"  onclick="del_node(' + obj[i].id + ')"><i class="icon-trash bigger-130"></i></a></div></td></tr>';
+
+        $('#tbl_all').append(html_str);
+    }
+}
+//ajax 请求表单数据
+function get_node_json(page_id) {
+    var keyword = encodeURI($('#keyword').val());
+    var page_size = $('#sel_size').val();
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url: "/nodes/node_list_json/",
+        async:false,
+        data:{"page_size": page_size,"page_id": page_id, "keyword": keyword},
+    }).done(function(json){
+        json_to_tbl(json.node_list);
+        show_page_navi(page_id, json.page_num);
+        show_node_num(json.node_num);
+    });
+}
+//翻页
+function change_page(page_id) {
+    get_node_json(page_id);
+}
+//关键字搜索
+function key_search() {
+    get_node_json(1);
+}
+//mian函数
+$(function(){
+
+    get_node_json(1);
+    show_sel_icon();
+    $("#sel_size").bind("change",function(){    //监听分页选择
+        if($(this).val()==0){
+          return;
+        }
+        else{
+            get_node_json(1);
+        }
+    });
+})
+</script>
+{% endblock %}

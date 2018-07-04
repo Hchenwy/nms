@@ -1,0 +1,91 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>网管系统</title>
+<!-- basic styles -->
+<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" />
+<!-- fonts -->
+<link rel="stylesheet" type="text/css" href="{% static "css/font-awesome.min.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "css/font-awesome.css" %}" />
+<!-- ace styles -->
+<link rel="stylesheet" href="{% static "css/ace.min.css" %}"/>
+</head>
+<body class="login-layout">
+<div class="main-container">
+  <div class="main-content">
+    <div class="row">
+      <div class="col-sm-10 col-sm-offset-1">
+        <div class="login-container">
+           <div class="center">
+            <img src="{% static "images/title.png" %}"/>
+          </div>
+          <div class="position-relative">
+            <div id="login-box" class="login-box visible widget-box no-border">
+              <div class="widget-body">
+              	  <h4 class="titleh center"> 退出 </h4>
+                <div class="widget-main" >
+                        {% if errors %}
+                        <p>
+                            <div class="alert alert-danger">
+                                {{ errors }}
+                            </div>
+                        </p>
+                        {% endif %}
+    
+                        {% if messages %}
+                            <p>
+                            <div class="alert alert-success" id="messages">
+                                {{ messages|safe }}
+                            </div>
+                        </p>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-lg-3">
+                                    <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">返回</a>
+                            </div>
+                        </div>
+                </div>
+              </div>
+              <!-- /widget-body --> 
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.col --> 
+    </div>
+    <!-- /.row --> 
+  </div>
+</div>
+<!--版权copyright-->
+ <div class="copyright">
+	<p>版权所有 中国电信集团公司 ICP证号：京ICP备09031924</p>
+	<p>COPYRIGHT (C) 2014 china telecom COMMUNITY. ALL RIGHT RESERVED</p>
+</div>
+</body>
+<script src="{% static 'js/jquery-2.0.3.min.js' %}"></script>
+<script>
+  var time = '{{ interval }}';
+  if (!time){
+      time = 5;
+  } else {
+      time = parseInt(time);
+  }
+  function redirect_page() {
+      if (time >= 0) {
+          var messages = '{{ messages|safe }}， <b>' + time +'</b> ...';
+          $('#messages').html(messages);
+          time--;
+          setTimeout(redirect_page, 1000);
+      }
+      else {
+          window.location.href = "{{ redirect_url }}";
+      }
+  }
+  {% if auto_redirect %}
+  window.onload = redirect_page;
+  {% endif %}
+</script>
+</html>

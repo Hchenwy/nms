@@ -1,0 +1,20 @@
+{% load i18n %}
+<div class="breadcrumbs" id="breadcrumbs">
+  <ul class="breadcrumb">
+    <li>
+      <i class="icon-home home-icon"></i>
+      <a href="{% url "index" %}">{% trans '主页' %}</a>
+    </li>
+    <li>
+    {% if app %}
+        <a>{{ app }}</a>
+    {% endif %}
+    </li>
+    {% if action %}
+    <li class="active">
+        <strong>{{ action }}</strong>
+    </li>
+    {% endif %}
+  </ul>
+  <!-- .breadcrumb --> 
+</div>

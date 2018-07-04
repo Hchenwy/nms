@@ -1,0 +1,269 @@
+{% extends 'base.html' %} {% load static %} {% load i18n %} {% load bootstrap3 %} {% block title %}
+<title>网管系统_机房列表</title>
+{% endblock %} {% block custom_head_css %}
+<link rel="stylesheet" type="text/css" href="{% static "css/sweetalert.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "css/jquery.dataTables.min.css" %}" />
+<style type="text/css">
+    .dataTables_length {
+        float: left;
+    }
+
+    .dataTables_filter {
+        float: right;
+        text-align: right;
+    }
+</style>
+{% endblock %} {% block content %}
+<div class="page-content">
+    <!--<div class="page-header">
+        <h1>
+                <i class="icon-user"></i>
+                {{ action }}
+        </h1>
+    </div> /.page-header -->
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="pull-left">
+                <a href="{% url 'assets:IDC-create' %}" class="btn btn-sm btn-success">
+                    <i class="icon-pencil align-top bigger-125"></i>
+                    {% trans "创建机房" %}
+                </a>
+            <label>
+            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target=".bs-set-modal-lg">
+                    <i class="icon-cog align-top bigger-125"></i>
+                    设置
+            </button>
+            </label>
+                <label>
+                    <button type="button" class="btn btn-sm btn-danger" id="del_all">
+                     <i class="icon-trash bigger-125"></i>
+                     删除所选
+                    </button>
+                </label>
+            </div>
+            <dev class="col-xs-12 table-reponsive">
+                {% csrf_token %}
+                <table class="datatable table table-striped table-bordered table-hover dataTable" cellspacing="0" width="100%" id="IDC-list">
+                    <thead>
+                        <tr>
+                            <!-- <th><label><input type="checkbox" class="ace" name="select_all" id="select_all"><span class="lbl"></span></label></th> -->
+                            <th>
+                                <label><input type="checkbox" class="ace" id="id-toggle-all"><span class="lbl"></span>
+                                <div class="inline position-relative">
+                                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                        <i class="icon-caret-down bigger-125 middle"></i>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-lighter dropdown-100">
+                                        <li>
+                                            <a id="id-select-all" href="#">全选</a>
+                                        </li>
+                                        <li>
+                                            <a id="id-select-none" href="#">取消选择</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </th>
+                            <th>名称</th>
+                            <th>资产数量</th>
+                            <th>带宽</th>
+                            <th>动作</th>
+                            <th>地址</th>
+                            <th>联系人</th>
+                            <th>电话</th>
+                            <th>内网</th>
+                            <th>外网</th>
+                            <th>运营商</th>
+                            <th>创建者</th>
+                            <th>创建日期</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                </table>
+            </dev>
+            <!-- PAGE CONTENT ENDS -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade bs-set-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header widget-header">
+                        <button type="button" class="bootbox-close-button close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title bolder blue">显示列选择</h4>
+                    </div>
+                    <div class="modal-body">
+                      <div data-toggle="buttons" class="btn-toolbar">
+                                  <div class="btn-group btn-group-vertical">
+                                          <a class="btn btn-primary active toggle-vis default-col" data-column="0">选框</a>
+                                          <a class="btn btn-primary active toggle-vis default-col" data-column="1">名称</a>
+                                          <a class="btn btn-primary active toggle-vis default-col" data-column="2">资产数量</a>
+                                          <a class="btn btn-primary active toggle-vis default-col" data-column="3">带宽</a>
+                                          <a class="btn btn-primary active toggle-vis default-col" data-column="4">动作</a>
+                                      </div>
+                                  <div class="btn-group btn-group-vertical">
+                                          <a class="btn btn-primary toggle-vis" data-column="5">地址</a>
+                                          <a class="btn btn-primary toggle-vis" data-column="6">联系人</a>
+                                          <a class="btn btn-primary toggle-vis" data-column="7">电话</a>
+                                          <a class="btn btn-primary toggle-vis" data-column="8">内网</a>
+                                          <a class="btn btn-primary toggle-vis" data-column="9">外网</a>
+                                      </div>
+                                  <div class="btn-group btn-group-vertical">
+                                          <a class="btn btn-primary toggle-vis" data-column="10">运营商</a>
+                                          <a class="btn btn-primary toggle-vis" data-column="11">创建者</a>
+                                          <a class="btn btn-primary toggle-vis" data-column="12">创建日期</a>
+                                          <a class="btn btn-primary toggle-vis" data-column="13">备注</a>
+                                      </div>
+                          </div>
+          
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-warning" id="empty-col"><i class="icon-refresh"></i>重置</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+{% endblock %} {% block custom_foot_js %}
+<script src="{% static "js/jquery.dataTables.js"  %}"></script>
+<script src="{% static "js/dataTables.buttons.min.js"  %}"></script>
+<script src="{% static "js/buttons.flash.min.js"  %}"></script>
+<script src="{% static "js/sweetalert.min.js"  %}"></script>
+<script src="{% static "js/toastr.min.js"  %}"></script>
+<script src="{% static "js/dropzone.min.js"  %}"></script>
+<script>
+    $(document).ready(function () {
+
+        var edit_html =
+            '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons"> <a class="green"  title="修改" href="{% url "assets:IDC-update" pk=99991935 %}"> <i class="icon-pencil bigger-130"></i> </a> <a class="red btn_IDC_delete" title="删除" data-uid="99991937" data-name="99991938"><i class="icon-trash bigger-130"></i></a> </div>'
+        var chkbox_html =
+            '<div class="select-item"><label><input type="checkbox" class="ace"  value="99991937"><span class="lbl"></span> </label></div>'
+        var ASSET_IDC_LIST_JSON_URL = "{% url 'assets:IDC-list-json' %}";
+        // translations for datatables
+        var oLanguages = {
+            oPaginate: {
+                sFirst: '首页',
+                sLast: '末页',
+                sNext: '下一页 ',
+                sPrevious: '上一页 '
+            },
+            sInfo: '显示 _START_ 到 _END_ 总共 _TOTAL_ 条',
+            sInfoEmpty: '没有可以显示的数据',
+            sInfoFiltered: '(过滤了一共 _MAX_ 条数据)',
+            sLengthMenu: '显示 _MENU_ 条',
+            sProcessing: '检索中',
+            sSearch: '查找:',
+            sZeroRecords: '没有可以显示的数据'
+        };
+
+        var dt_table = $('#IDC-list').dataTable({
+            "sPaginationType": "full_numbers",
+            "oLanguage": oLanguages,
+            "bFilter": true,
+            "select": true,
+            //"buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
+            "bPaginate": true,
+            "aLengthMenu": [
+                [10, 20, 40, 100],
+                [10, 20, 40, 100]
+            ],
+            "iDisplayLength": 10,
+            "aaSorting": [
+                [0, "desc"]
+            ],
+            "bAutoWidth": true,
+            "aoColumns": [
+                { "bSortable": false, "bSearchable": false, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": false, "bSearchable": false, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+                { "bSortable": true, "bSearchable": true, "sClass": "center" },
+            ],
+            "aoColumnDefs": [{
+                    "aTargets": [4],
+                    "mRender": function (data, type, full) {
+                        var a_html = edit_html.replace("99991935", data);
+                        var b_html = a_html.replace("99991937", data);
+                        return b_html.replace("99991938", data);
+                    }
+                },
+                {
+                    "aTargets": [0],
+                    "mRender": function (data, type, full) {
+                        return chkbox_html.replace("99991937", data);
+                    }
+                }
+            ],
+            "bProcessing": true,
+            "bServerSide": true,
+            "bStateSave": true,
+            "sAjaxSource": ASSET_IDC_LIST_JSON_URL
+        });
+        
+
+        var dt_api = $("#IDC-list").dataTable().api()
+        chosen_col(dt_api);
+
+        var col_num = 14;
+        var show_array = [0, 1, 2, 3, 4];
+        show_col(dt_api, show_array);
+        $("#empty-col").on('click',  function () {
+            hiden_col(dt_api, col_num);
+            show_col(dt_api, show_array);
+        });
+
+        $("#IDC-list").on('click', '.btn_IDC_delete', function () {
+            var name = "";
+            var $this = $(this);
+            var uid = $this.data('uid');
+            var the_url = '{% url "api-assets:IDC-detail" pk=99991937 %}'.replace('99991937', uid);
+            //$.getJSON("/api/users/v1/users/99991937/?format=json".replace("99991937", uid),  async=false, function(response, status, xhr) {
+            //    //alert(JSON.stringify(response));
+            //    //alert(response.name);
+            //    name = response.name;
+            //});
+            $.ajax({
+                type: "GET",
+                url: '{% url "api-assets:IDC-detail" pk=99991937 %}'.replace('99991937', uid),
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    name = data.name;
+                    return false;
+                },
+                error: function () {
+                    alert("异常");
+                }
+            });
+            objectDelete($this, name, the_url);
+        })
+
+        $("#del_all").on('click', function() {
+            var plain_id_list = [];
+            $(".select-item input[type=checkbox]:checked").each(function() {
+                plain_id_list.push(jQuery(this).attr("value"));
+            });
+            if (plain_id_list.length != 0) {
+                var the_url = "/api/assets/v1/IDCs/";
+                doDelete(the_url, plain_id_list);
+                //location.href = "{% url 'assets:asset-list' %}";
+            }
+        })
+
+    });
+</script>
+
+{% endblock %}

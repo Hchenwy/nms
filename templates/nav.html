@@ -1,0 +1,99 @@
+{% load static %}
+<div class="sidebar" id="sidebar">
+    <script type="text/javascript">
+      try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
+    </script>
+  <div class="sidebar-shortcuts" id="sidebar-shortcuts">
+    <div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+      <label>
+        <a class="btn btn-sm btn-success" href="{% url "users:user-list" %}">
+        <i class=" icon-signal"></i>
+        </a>
+      </label>  
+      <label>
+        <a class="btn btn-sm btn-info" href="{% url "users:user-list" %}">
+        <i class=" icon-pencil"></i>
+        </a>
+      </label>  
+      <label>
+        <a class="btn btn-sm btn-warning" href="{% url "users:user-list" %}">
+        <i class=" icon-group"></i>
+        </a>
+      </label>  
+      <label>
+        <a class="btn btn-sm btn-danger" href="{% url "users:user-list" %}">
+        <i class=" icon-cogs"></i>
+        </a>
+      </label>  
+    </div>
+  
+    <div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+      <span class="btn btn-success"></span>
+  
+      <span class="btn btn-info"></span>
+  
+      <span class="btn btn-warning"></span>
+  
+      <span class="btn btn-danger"></span>
+    </div>
+  </div>
+  <ul class="nav nav-list">
+    <li id="index">
+      <a href="/">
+        <i class="icon-dashboard"></i>
+        <span class="menu-text"> 主页 </span>
+      </a>
+    </li>
+    <li id="alert"> <a href="#" class="dropdown-toggle"> <i class="icon-desktop"></i> <span class="menu-text"> 监控信息</span> <b class="arrow icon-angle-down"></b> </a>
+      <ul class="submenu">
+        <li id="alert_list"> <a href="{% url 'alert_list' %}?nodeid=1&hostid=0&priority=0"> <i class="icon-double-angle-right"></i> 告警信息 </a> </li>
+      </ul>
+    </li>
+   {% if user.is_superuser %}
+    <li id="users"> <a href="#" class="dropdown-toggle"> <i class="icon-list"></i> <span class="menu-text"> 用户管理 </span> <b class="arrow icon-angle-down"></b> </a>
+      <ul class="submenu">
+        <li id="user"> <a href="{% url "users:user-list" %}"> <i class="icon-double-angle-right"></i> 用户 </a> </li>
+        <li id="user-group"> <a href="{% url "users:user-group-list" %}"> <i class="icon-double-angle-right"></i> 用户组 </a> </li>
+      </ul>
+      </li>
+    {% endif %}
+     <li id="assets"> <a href="#" class="dropdown-toggle"> <i class="icon-truck"></i> <span class="menu-text"> 资产管理 </span> <b class="arrow icon-angle-down"></b> </a>
+      <ul class="submenu">
+        <li id="asset"> <a href="{% url "assets:asset-list" %}"> <i class="icon-double-angle-right"></i> 资产 </a> </li>
+        <li id="asset-group"> <a href="{% url "assets:asset-group-list" %}"> <i class="icon-double-angle-right"></i> 资产组 </a> </li>
+        <li id="IDC"> <a href="{% url "assets:IDC-list" %}"> <i class="icon-double-angle-right"></i> 机房 </a> </li>
+      </ul>
+    </li> 
+    <li id="nodes"> <a href="#" class="dropdown-toggle"> <i class="icon-list"></i> <span class="menu-text"> 配置管理 </span> <b class="arrow icon-angle-down"></b> </a>
+      <ul class="submenu">
+        <li id="node_list"> <a href="{% url 'node_list' %}"> <i class="icon-double-angle-right"></i> 节点管理 </a> </li>
+        <li id="group_list"> <a href="{% url 'group_list' %}"> <i class="icon-double-angle-right"></i> 群组管理 </a> </li>
+        <li id="host_list"> <a href="{% url 'host_list' %}?nodeid=1&groupid=0"> <i class="icon-double-angle-right"></i> 设备管理 </a> </li>
+        <li id="template_list"> <a href="{% url 'template_list' %}"> <i class="icon-double-angle-right"></i> 模板管理 </a> </li>
+        <!--<li id="item_list" > <a href="{% url 'item_list' %}?nodeid=1&hostid=0"> <i class="icon-double-angle-right"></i> 监控项管理 </a> </li>
+        <li id="trigger_list"> <a href="{% url 'trigger_list' %}?nodeid=1&hostid=0"> <i class="icon-double-angle-right"></i> 触发器管理 </a> </li>-->
+      </ul>
+    </li>
+    <!--<li> <a href="#" class="dropdown-toggle"> <i class="icon-edit"></i> <span class="menu-text"> 部署管理 </span> <b class="arrow icon-angle-down"></b> </a>
+      <ul class="submenu">
+        <li> <a href="dm-resourse.html"> <i class="icon-double-angle-right"></i> 资源管理 </a> </li>
+        <li> <a href="dm-online.html"> <i class="icon-double-angle-right"></i>安装部署 </a> </li>
+        <li> <a href="dm-order.html"> <i class="icon-double-angle-right"></i> 运行命令 </a> </li>
+        <li> <a href="dm-execyte.html"> <i class="icon-double-angle-right"></i> 脚本执行 </a> </li>
+        <li> <a href="dm-audit.html"> <i class="icon-double-angle-right"></i> 脚本审核 </a> </li>
+      </ul>
+    </li>-->
+   {% if user.is_superuser %}
+    <li id="perms"> <a href="#" class="dropdown-toggle"> <i class="icon-tag"></i> <span class="menu-text"> 权限管理 </span> <b class="arrow icon-angle-down"></b> </a>
+      <ul class="submenu">
+        <li id="asset-permission"> <a href="{% url "perms:asset-permission-list" %}"> <i class="icon-double-angle-right"></i> 资产授权 </a> </li>
+      </ul>
+    </li>
+   {% endif %}
+  </ul>
+  <!-- /.nav-list -->
+  <div class="sidebar-collapse" id="sidebar-collapse"> 
+    <i class="icon-double-angle-left" data-icon1="icon-double-angle-left" data-icon2="icon-double-angle-right"></i> 
+  </div>
+</div>
+<!-- #EndLibraryItem -->

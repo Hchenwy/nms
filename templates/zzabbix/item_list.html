@@ -1,0 +1,537 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Zalt NMS</title>
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="tabbable">
+                <div class="tab-content no-border padding-lr-24">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="dataTables_length pull-left">
+                                <label><button id="addBtn" type="button" class="btn  btn-success " data-toggle="modal" onclick="add_item()"> 新增监控 </button></label>
+                                <label><button type="button" class="btn  btn-purple " data-toggle="modal" onclick="sync_zabbix()"> 同步数据 </button></label>
+                                <label><button type="button" class="btn btn-danger" data-toggle="modal" onclick="del_all_item()"> 删除所选 </button></label>
+                            </div>
+                            <div class="dataTables_length pull-right">
+                                <label>所属节点：
+                                    <select id="father_node" onchange="sel_node()">
+                                        {% for node in node_list %}
+                                            {% if nodeid == node.id %}
+                                            <option value="{{ node.id }}" selected="selected">{{ node.name }}</option>
+                                            {% else %}
+                                            <option value="{{ node.id }}">{{ node.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label>主机/模板：
+                                    <select id="hosttemplate" onchange="sel_host()" style="width:250px">
+                                        <option value="0">所有</option>
+                                        {% for host in host_list %}
+                                            {% if hostid == host.hostid %}
+                                            <option value="{{ host.hostid }}" selected="selected">{{ host.host }}</option>
+                                            {% else %}
+                                            <option value="{{ host.hostid }}">{{ host.host }}</option>
+                                            {% endif%}
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label><input  id="keyword" type="text" class="w210 inputCheck1" placeholder="关键字搜索"></label>
+                                <label><button type="button" class="btn btn-info " onclick="key_search()"> 查询 </button></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xs-12 " >
+                            <table class="table table-striped table-bordered table-hover" align="left">
+                                <thead>
+                                    <tr role="row">
+                                        <th width="30"> <label><input type="checkbox" class="ace" id="select_all"><span class="lbl"></span></label></th>
+                                        <th>主机/模板</th>
+                                        <th>监控名称</th>
+                                        <th>监控键值</th>
+                                        <th>所属节点</th>
+                                        <th width="80">触发器</th>
+                                        <th width="80">状态</th>
+                                        <th width="60">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl_all"></tbody>
+                            </table>
+                            <div class="col-sm-8 padding-left-0" class="form-inline">
+                                <label id="sel_icon"></label>
+                                <label id="node_num"></label>
+                            </div>
+                            <div class="col-sm-4 padding-right-0">
+                                <div class="dataTables_paginate paging_bootstrap">
+                                    <ul class="pagination" id="page_navi"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 新增、编辑监控项 -->
+<div id="additem" class="modal fade in" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog" style="width: 1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="bootbox-close-button close" data-dismiss="modal">×</button>
+                <h4 class="modal-title">编辑监控项</h4>
+            </div>
+            <div class="modal-body">
+                <!--<div style="height:500px; overflow:auto;">-->
+                    <div class="scroller" data-always-visible="1" data-rail-visible1="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" role="form" id="confirmItem">
+                                        <input type="hidden" id="itemid" name="itemid" value="0">
+                                        <input type="hidden" id="nodeid" name="nodeid" value="1">
+                                        <input type="hidden" id="hostid" name="hostid" value="0">
+                                        <div class="form-body">
+                                            <div class="form-group" id="fatherItem" style="display:none">
+                                                <label class="col-md-2 control-label">上层监控项:</label>
+                                                <div class="col-md-8" id="itemLink"></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>监控项名</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" required class="form-control" id="name" name="name" value=""
+                                                        data-bv-notempty="true" data-bv-notempty-message="监控项名称不能为空！"
+                                                        data-bv-stringlength="true" data-bv-stringlength-max="30" data-bv-stringlength-message="长度不能超过30"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>协议类型</label>
+                                                <div class="col-md-4">
+                                                    <select id="type" name="type" class="form-control" onfocus="this.defaultIndex=this.selectedIndex;" onchange="sel_protocol()">
+                                                        <option value="0">Zalt agent</option>
+                                                        <option value="7">Zalt agent (active)</option>
+                                                        <!--<option value="1" >SNMPv1 agent</option>-->
+                                                        <option value="4" >SNMPv2 agent</option>
+                                                        <!--<option value="6" >SNMPv3 agent</option>-->
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" id="oid">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>SNMP OID</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" required class="form-control" id="snmp_oid" name="snmp_oid" value=""
+                                                        data-bv-notempty="true" data-bv-notempty-message="SNMP OID不能为空！"
+                                                        data-bv-stringlength="true" data-bv-stringlength-max="50" data-bv-stringlength-message="长度不能超过50"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" id="community">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>SNMP团体</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" required class="form-control" id="snmp_community" name="snmp_community" value=""
+                                                        data-bv-notempty="true" data-bv-notempty-message="SNMP团体不能为空！"
+                                                        data-bv-stringlength="true" data-bv-stringlength-max="50" data-bv-stringlength-message="长度不能超过50"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>监控键值</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" required class="form-control" id="key" name="key" value=""
+                                                        data-bv-notempty="true" data-bv-notempty-message="监控键值不能为空！"/>
+                                                </div>
+                                                <button type="button" class="btn btn-success " data-toggle="modal" onclick="sel_key()"> 选择 </button>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>返回值类型</label>
+                                                <div class="col-md-4">
+                                                    <select id="value-type" name="value-type" class="form-control" onfocus="this.defaultIndex=this.selectedIndex;">
+                                                        <option value="3" >整数（非负）</option>
+                                                        <option value="0">浮点数</option>
+                                                        <option value="1">字符</option>
+                                                        <option value="2" >日志</option>
+                                                        <option value="4" >文本</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">返回值单位</label>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" id="units" name="units" value=""/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>存储值类型</label>
+                                                <div class="col-md-4">
+                                                    <select id="delta" name="delta" class="form-control" onfocus="this.defaultIndex=this.selectedIndex;">
+                                                        <option value="0">原始值</option>
+                                                        <option value="1">速率</option>
+                                                        <option value="2">差量</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>更新间隔</label>
+                                                <div class="col-md-4">
+                                                    <input type="text" required class="form-control" id="delay" name="delay" value="30s"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"><strong class="hint">*</strong>监控状态</label>
+                                                <div class="col-md-9">
+                                                    <label class="margin-right-10">
+                                                        <input name="status" type="radio" class="ace" value="0" checked="checked">
+                                                        <span class="lbl">&nbsp;正常监控</span>
+                                                    </label>
+                                                    <label class="margin-right-10">
+                                                        <input name="status" type="radio" class="ace" value="1">
+                                                        <span class="lbl">&nbsp;暂停监控</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">监控项描述</label>
+                                                <div class="col-md-8">
+                                                    <textarea id="description" name="description" rows="4" class="form-control"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="confirm_item()">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 选择键值 -->
+<div id="selectkey" class="modal fade in" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog" style="width: 1020px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="bootbox-close-button close" data-dismiss="modal">×</button>
+                <h4 class="modal-title">标准键值</h4>
+            </div>
+            <div class="modal-body">
+                <div style="height:500px; overflow:auto;">
+                    <div class="scroller" data-always-visible="1" data-rail-visible1="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="dataTables_length pull-right">
+                                    <label>协议类型：<input size="30" type="text"  readonly="readonly" name="protype" id="protype" value=""/></label>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 ">
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr role="row">
+                                            <th>键值</th>
+                                            <th>描述</th>
+                                            <th width="50">选择</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="key_tbl">
+                                        <tr>
+	                                        <td>ping.hostname</td>
+	                                        <td>获取客户端主机名，返回字符串</td>
+	                                        <td class="text-center"><label><input name="sel_key" type="radio" class="ace" value="197" data-key="impala.chk[20000047,idc_active_resources_ip]"/>
+                                                <span class="lbl">&nbsp;</span>
+							                </label></td>
+	                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="confirm_key()">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block custom_foot_js %}
+<script src="/static/js/jquery.shiftcheckbox.js"></script>
+<script src="/static/js/bootstrapValidator/js/bootstrapValidator.js"></script>
+<script src="/static/js/zabbix/page_control.js"></script>
+<script >
+/* 新增、编辑监控项 */
+//选择协议类型
+function display_snmp() {
+    var type = $('#type').val();
+
+    if (type == 1 || type == 4) {
+        $('#oid').css("display", "block");
+        $('#community').css("display", "block");
+        $('#snmp_oid').val('interfaces.ifTable.ifEntry.ifInOctets.1');
+        $('#snmp_community').val('public');
+    } else {
+        $('#oid').css("display", "none");
+        $('#community').css("display", "none");
+        $('#snmp_oid').val('');
+        $('#snmp_community').val('');
+    }
+}
+function sel_protocol() {
+    display_snmp();
+}
+//添加第一层模态框
+function add_item() {
+    $('#confirmItem')[0].reset();
+    $("#confirmItem").data("bootstrapValidator").resetForm();
+    $('#fatherItem').attr('style','display:none');
+    $('#type').attr('onchange', 'sel_protocol()');
+    $('#value-type').attr('onchange', '');
+    $('#delta').attr('onchange', '');
+    $('#confirmItem').find('input, textarea').attr('readonly',false);
+    $('#itemid').val('0');
+    $('#additem').modal('show');
+    display_snmp();
+}
+//json转parameter
+function json_to_param(data) {
+    var father_node = $('#father_node').val();
+
+    if (data.father_item_id != undefined) {
+        $('#fatherItem').attr('style','display:block');
+        $('#confirmItem').find('input, textarea').attr('readonly',true);
+        $('#type').attr('onchange', 'this.selectedIndex=this.defaultIndex;');
+        $('#value-type').attr('onchange', 'this.selectedIndex=this.defaultIndex;');
+        $('#delta').attr('onchange', 'this.selectedIndex=this.defaultIndex;');
+        $('#itemLink').empty();
+        $('#itemLink').append('<a href="/nodes/item_list/?nodeid=' + father_node + '&hostid=' + data.father_id + '&itemid=' + data.father_item_id + '">' + data.father_name + '</a>');
+    }
+    if (data.description != undefined) $('#description').val(data.description);
+    if (data.delay != undefined) $('#delay').val(data.delay);
+
+    if (data.key != undefined) $('#key').val(data.key);
+    if (data.name != undefined) $('#name').val(data.name);
+
+    if (data.units != undefined) $('#units').val(data.units);
+
+    if (data.type != undefined) {
+        $('#type option[value="'+ data.type +'"]').attr("selected", true);
+    }
+    if (data.value_type != undefined) {
+        $('#value_type option[value="'+ data.value_type +'"]').attr("selected", true);
+    }
+    if (data.delta != undefined) {
+        $('#delta option[value="'+ data.delta +'"]').attr("selected", true);
+    }
+    if (data.status != undefined) {
+        $(":radio[name='status'][value='" + data.status + "']").attr("checked", "checked");
+    }
+    if(data.item_id != undefined) $('#itemid-db').val(data.item_id);
+    $('#nodeid').val($('#father_node').val());
+}
+//编辑第一层模态框
+function edit_item(item_id) {
+    var node_id = $('#father_node').val();
+    if (item_id == undefined) return false;
+
+    add_item();
+    $.post("{% url 'item_edit' %}", {
+        "node_id": node_id,
+        "item_id": item_id,
+    }, function(data){
+        console.log(data);
+        json_to_param(data);
+        $('#itemid').val(item_id);
+    }, "json");
+}
+//提交第一层模态框内容
+$('#confirmItem').bootstrapValidator();
+function confirm_item() {
+    $('#nodeid').val($('#father_node').val());
+    $('#hostid').val($('#hosttemplate').val());
+    form_list = $('#confirmItem').serialize();
+
+    $('#confirmItem').bootstrapValidator('validate');
+    if($("#confirmItem").data('bootstrapValidator').isValid()) {
+        $.get("{% url 'item_add' %}?" + form_list, {}, function(data){
+            if (data != '') alert(data);
+            $('#additem').modal('hide');
+            window.location.reload();
+        });
+    }
+}
+/* 第二层模态框 */
+//选择键值
+function sel_key() {
+    var key_type = $('#type').val();
+    if (key_type == undefined) key_type = '0';
+    if (key_type == '0') {
+        $('#protype').val('Zalt agent');
+    } else if (key_type == '7') {
+        $('#protype').val('Zalt agent (active)');
+    }
+
+    $('#selectkey').modal('show');
+    $.post("{% url 'item_get_key' %}", {
+        "key_type": key_type,
+    }, function(data){
+        json_to_key(data.key_list);
+    }, "json");
+}
+//显示键值table
+function json_to_key(list) {
+    $('#key_tbl').empty();
+    if (list == undefined) return false;
+    for (var i=0; i<list.length; i++) {
+        var item_str = ""
+
+        item_str += '<tr><td>' + list[i].key + '</td>';
+        item_str += '<td>' + list[i].description + '</td>';
+        item_str += '<td class="text-center"><label><input name="sel_key" type="radio" class="ace" value="' + list[i].key + '"/><span class="lbl">&nbsp;</span></label></td></tr>';
+        $('#key_tbl').append(item_str);
+    }
+}
+//提交第二层模态框内容
+function confirm_key() {
+    var key = $('input[name="sel_key"]:checked').val();
+    if (key == undefined) key = "";
+
+    //console.log(key);
+    $("#key").val(key);
+    $('#selectkey').modal('hide');
+}
+
+/* 删除监控项 */
+//删除单个节点
+function del_item(id) {
+    var node_id = $('#father_node').val();
+    if (node_id == undefined) node_id = '1'
+    if (confirm("确定删除")) {
+        $.post("{% url 'item_del' %}", {
+            "item_id": id,
+            "node_id": node_id,
+        }, function(data){
+            alert(data);
+            window.location.reload();
+        })
+    }
+}
+//全选删除
+$('#select_all').click(function(){
+    var state = $(this).prop("checked");
+    $("input[type='checkbox']").prop("checked", state);
+})
+//删除所有节点
+function del_all_item() {
+    var check_array = [];
+
+    $("input:checkbox[name='selected']:checked").each(function() {
+        check_array.push($(this).val());
+    });
+    if (check_array.length > 0) {
+        del_item(check_array.join(','));
+    }
+}
+/**************** 分页、翻页 ***************/
+//json转table显示
+function json_to_tbl(obj) {
+    $('#tbl_all').empty();
+    if (typeof(obj) == "undefined") {
+        return;
+    }
+    for (var i=0; i<obj.length; i++) {
+        var html_str = ""
+
+        html_str += '<tr><td class="text-center"><label><input type="checkbox" class="ace" name="selected" value="' + obj[i].item_id + '"><span class="lbl"></span> </label></td>';
+        html_str += '<td>' + obj[i].host + '</td>';
+        if (obj[i].father_host) {
+            html_str += '<td><a>' + obj[i].father_host + '</a>:' + obj[i].name + '</td>';
+        } else {
+            html_str += '<td>' + obj[i].name + '</td>';
+        }
+        html_str += '<td>' + obj[i].key_ + '</td>';
+        html_str += '<td>' + obj[i].father_node + '</td>';
+        html_str += '<td>触发器 ' + obj[i].trigger_num + '</td>';
+        if (obj[i].status == 0) html_str += '<td><span class="label label-sm label-success">正常监控</span></td>';
+        else if (obj[i].status == 1) html_str += '<td><span class="label label-sm label-default">暂停监控</span></td>';
+        else html_str += '<td><span class="label label-sm label-danger">未知状态</span></td>';
+        html_str += '<td><div class="visible-md visible-lg hidden-sm hidden-xs action-buttons"><a class="green" title="编辑" data-toggle="modal" onclick="edit_item(' + obj[i].item_id
+            + ')"><i class="icon-pencil bigger-130"></i></a><a class="red" title="删除" data-toggle="modal"  onclick="del_item(' + obj[i].item_id + ')"><i class="icon-trash bigger-130"></i></a></div></td></tr>';
+
+        $('#tbl_all').append(html_str);
+    }
+}
+//ajax 请求表单数据
+function get_node_json(page_id) {
+    var keyword = encodeURI($('#keyword').val());
+    var father_node = $('#father_node').val();
+    var page_size = $('#sel_size').val();
+    var host_id = $('#hosttemplate').val();
+
+    if (page_size == undefined) page_size = 10;
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        url: "/nodes/item_list_json/",
+        async:false,
+        data:{"page_size": page_size,"page_id": page_id, "keyword": keyword, "father_node": father_node, "host_id": host_id},
+    }).done(function(json){
+        json_to_tbl(json.item_list);
+        show_page_navi(page_id, json.page_num);
+        show_node_num(json.item_num);
+    });
+}
+//翻页
+function change_page(page_id) {
+    get_node_json(page_id);
+}
+//关键字搜索
+function key_search() {
+    get_node_json(1);
+}
+//节点搜索
+function sel_node() {
+    var father_node = $('#father_node').val();
+    location.href = "{% url 'item_list' %}?nodeid=" + father_node + "&hostid=0";
+}
+function sel_host() {
+    var father_node = $('#father_node').val();
+    var host_id = $('#hosttemplate').val();
+    location.href = "{% url 'item_list' %}?nodeid=" + father_node + "&hostid=" + host_id;
+}
+//同步zabbix数据
+function sync_zabbix() {
+    if (confirm("确定同步全量数据？")) {
+        $.post("{% url 'item_sync_zabbix' %}", {
+            "node_id": $('#father_node').val(),
+        }, function(data){
+            alert(data);
+            window.location.reload();
+        });
+    }
+}
+//mian函数
+$(function(){
+    var host_id = $('#hosttemplate').val();
+    var father_item_id = {{ father_item_id }};
+
+    if (host_id == 0) $('#addBtn').attr('disabled', true);
+    get_node_json(1);
+    show_sel_icon();
+    if (father_item_id) edit_item(father_item_id);
+    $("#sel_size").bind("change",function(){    //监听分页选择
+        if($(this).val()==0){
+          return;
+        }
+        else{
+            get_node_json(1);
+        }
+    });
+})
+</script>
+{% endblock %}

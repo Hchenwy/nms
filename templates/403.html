@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% block title %}
+<title>网管系统_首次登录</title>
+{% endblock %}
+{% block content %}
+<div class="page-content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="well">
+                <h1 class="grey lighter smaller">
+                    <span class="blue bigger-125">
+                        <i class="icon-heart-empty"></i>
+                        403
+                    </span>
+                    对不起，您没有相应权限！
+                </h1>
+            
+                <hr>
+                <h3 class="lighter smaller">
+                    请联系
+                    <i class="icon-phone icon-animated-wrench bigger-125"></i>
+                   系统管理员.
+                </h3>
+            
+                <div class="space"></div>
+            
+                <div>
+            
+                    <ul class="list-unstyled spaced inline bigger-110 margin-15">
+                        <li>
+                            <i class="icon-hand-right blue"></i>
+                            查看<a href="#">使用说明</a>.
+                        </li>
+                    </ul>
+                </div>
+            
+                <hr>
+                <div class="space"></div>
+            
+                <div class="center">
+                    <a href="{% url "users:logout" %}" class="btn btn-grey">
+                        <i class="icon-off"></i>
+                        退出系统
+                    </a>
+            
+                    <a href="#" class="btn btn-primary" onClick="javascript :history.go(-1);">
+                        <i class="icon-dashboard"></i>
+                        返回上一页
+                    </a>
+                </div>
+            </div>
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div>
+{% endblock %}
+{% block custom_foot_js %} 
+
+{% endblock %}

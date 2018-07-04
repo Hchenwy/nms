@@ -1,0 +1,15 @@
+{% load static %}
+<script src="{% static "js/jquery-2.0.3.min.js"  %}" type="text/javascript" charset="utf-8"></script> 
+<script src="{% static "js/bootstrap.min.js"  %}"></script> 
+<script src="{% static "js/ace.min.js"  %}"></script> 
+<script src="{% static "js/nms.js"  %}"></script>
+<script>
+activeNav();
+$(document).ready(function(){
+    setAjaxCSRFToken();
+    $('textarea').attr('rows', 5);
+    if ($('.tooltip')[0]) {
+        $('.tooltip').tooltip();
+    }
+});
+</script> 
